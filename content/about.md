@@ -1,5 +1,5 @@
 +++
-title = "About Me"
+title = "about me"
 +++
 
 I'm a CS student in Tehran. 19 years of age, but it feels like I was just born last year, because a lot of my new pastimes and hobbies were obtained during the trying Internet shutdown era.
