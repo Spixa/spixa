@@ -1,6 +1,8 @@
 +++
 title = "First blog post"
 date = 2026-10-03
+[taxonomies]
+tags = ["first!"]
 +++
 This is the actual first blog post, previous ones are imported devlogs from my telegram channel.
 

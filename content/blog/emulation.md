@@ -1,6 +1,8 @@
 +++
 title = "Emulation Journey"
 date = 2026-09-19
+[taxonomies]
+tags = ["rust", "emulation"]
 +++
 
 I decided to make an emulator alongside my programming language which within itself is a separate and very cool project! I get to understand and implement the ISA's scientists and engineers have carefully engineered

@@ -1,6 +1,8 @@
 +++
 title = "Making the stack for my emulator"
 date = 2026-09-22
+[taxonomies]
+tags = ["rust", "emulation"]
 +++
 
 See thing is, making the stack is as easy as giving it an address, usually the end of the entire memory region. in my case at `0x0800_0000` (128MiB in), because it grows negatively inwards. And to use it, all you have to do, is move around the `sp` register (stack pointer) which is the alias for `x2`. and then calling sw and lw on this register to do pushing and popping operations!
@@ -13,7 +15,8 @@ pub fn new(bus: Bus) -> Self {
         pc: DRAM_BASE,
         bus,
     };
-    cpu.regs[2] = 0x0800_0000; // set stack pointer (sp) to somewhere at the top of the memory; 
+    // set stack pointer (sp) to somewhere at the top of the memory
+    cpu.regs[2] = 0x0800_0000; 
     cpu
 }
 ```

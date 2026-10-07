@@ -1,6 +1,8 @@
 +++
 title = "Adding syscalls to my emulator"
 date = 2026-09-21
+[taxonomies]
+tags = ["rust", "emulation"]
 +++
 
 When it comes to a 32-bit Linux program, the ecall instruction triggers a system call with these register roles:
