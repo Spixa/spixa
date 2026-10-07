@@ -5,7 +5,8 @@ date = 2026-09-22
 tags = ["rust", "emulation"]
 +++
 
-See thing is, making the stack is as easy as giving it an address, usually the end of the entire memory region. in my case at `0x0800_0000` (128MiB in), because it grows negatively inwards. And to use it, all you have to do, is move around the `sp` register (stack pointer) which is the alias for `x2`. and then calling sw and lw on this register to do pushing and popping operations!
+#### Making the stack
+Making the stack is as easy as giving it an address, usually the end of the entire memory region. in my case at `0x0800_0000` (128MiB in), because it grows negatively inwards. And to use it, all you have to do, is move around the `sp` register (stack pointer) which is the alias for `x2`. and then calling sw and lw on this register to do pushing and popping operations!
 
 no need to set its location at the start of the program though, it is preemptively set:
 ```rust
@@ -21,7 +22,7 @@ pub fn new(bus: Bus) -> Self {
 }
 ```
 
-we can actually test it right now, I'll explain what this does in the next post, but here's the test:
+We can actually test it right now, I'll explain what this does in the next post, but here's the test:
 ```asm
 .section .text
 .globl _start
@@ -85,10 +86,13 @@ inner:
     ret
 ```
 
-this simple stack test passed.
-> Meaning we got exit code 0 after executing it, due to exit being called while `a0` had `0x0` loaded and not `0x1`, `0x2`, `0x3`, `0x4`, `0x5` or `0x6`, as these were the fail cases inside the code, as you can see from all the li a0, n calls.
+This simple stack test passed.
+{% alert(note=true) %} 
+Passing means we got exit code 0 after executing it, due to exit being called while `a0` had `0x0` loaded and not `0x1`, `0x2`, `0x3`, `0x4`, `0x5` or `0x6`, as these were the fail cases inside the code, as you can see from all the `li a0, n` calls.
+{% end %}
 
 This means we are ready for stack frames for all our functions, It is however the job of the codegen and by extention the compiler to generate all the assembly for the function prologue and epilogue* which I'll be talm bout soon
 
+##### Function prologue and epilogue
 The function prologue/epilogue are headers and footers for our functions, which need to facilitate the creation of the stack frame and storing the return address and other information, at the start.
 and then pulling back the stack pointer and reloading the previous return address from the memory at the end.
