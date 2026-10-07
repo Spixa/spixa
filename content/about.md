@@ -4,7 +4,7 @@ title = "About Me"
 
 I'm a CS student in Tehran. 19 years of age, but it feels like I was just born last year, because a lot of my new pastimes and hobbies were obtained during the trying Internet shutdown era.
 
-At first I didn't believe this fact myself, but it is true and I attribute this to a philosophy my friend pioneered, "No tomorrows". It's hard for me to explain this to you, without you first being actively oppresed, possibly killed alongside your family, and if you managed to make it, surviving crippling inflation and intermittent loss of public utilities. But it goes like: shit like this changes you.
+At first I didn't believe this fact myself, but it is true and I attribute this to a philosophy my friend pioneered, "No tomorrows". It's hard for me to explain this to you, without you first being actively oppresed, possibly lose your friends, and if you managed to make it, survive crippling inflation and intermittent loss of public utilities. But it goes like: shit like this changes you.
 
 {% crt() %}
 ```

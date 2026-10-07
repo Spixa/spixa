@@ -2,10 +2,6 @@
 title = "Home"
 +++
 
-Heya! Welcome to my corner. I'm still working on this website. One can sorta think of here as exclusively my personal blog until I am fully settled in. 
-
-The goal is to import all my previous writeups (from [here](https://t.me/maybe_uninit)) first. ُI'll also leave my musings in the blog section. It's still under construction, but yeah. That's it for now, enjoy your stay. Have fun looking around. Also cool CRT effect, no? I'm thinking of making one of my projects interactive with one of these.
-
 {% crt() %}
  ```
                                                                       
@@ -44,3 +40,8 @@ The goal is to import all my previous writeups (from [here](https://t.me/maybe_u
 {% alert(important=true) %}
 Play Outer Wilds!
 {% end %}
+Heya! Welcome to my corner. I'm still working on this website. One can sorta think of here as exclusively my personal blog until I am fully settled in. 
+
+The goal is to import all my previous writeups (from [here](https://t.me/maybe_uninit)) first. ُI'll also leave my musings in the blog section. It's still under construction, but yeah. That's it for now, enjoy your stay. Have fun looking around. Also cool CRT effect, no? I'm thinking of making one of my projects interactive with one of these.
+
+
