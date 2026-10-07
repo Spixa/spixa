@@ -1,7 +1,7 @@
 # The URL the site will be built for
 base_url = "https://moss.spixa.cc.cd"
 theme = "duckling"
-title = "Welcome"
+title = "welcome!"
 # Whether to automatically compile all Sass files in the sass directory
 compile_sass = true
 
@@ -20,9 +20,9 @@ katex = true
 
 [extra.nav]
 links = [
-    { url = "@/about.md", name = "About" },
-    { url = "@/blog/_index.md", name = "Blog" },
-    { url = "@/projects/_index.md", name = "Projects" },
+    { url = "@/about.md", name = "about me" },
+    { url = "@/blog/_index.md", name = "blog" },
+    { url = "@/projects/_index.md", name = "my projects" },
 ]
 
 [extra.footer]
