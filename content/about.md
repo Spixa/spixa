@@ -31,7 +31,7 @@ At first I didn't believe this fact myself, but it is true and I attribute this 
 ```
 {% end %}
 {% alert(note=true) %}
-This is a cool looking fish, representing the `::<>` operator in Rust. I hope you like these ASCII arts, I'll be dropping them everywhere, extensively.
+This is a cool looking fish, representing the `::<>` operator in Rust.
 {% end %}
 
 
