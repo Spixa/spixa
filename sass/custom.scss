@@ -13,3 +13,18 @@
     line-height: 1.2;
   }
 }
+
+.terminal-shell {
+    padding: 1rem;
+    overflow-x: auto;
+}
+
+.terminal-shell pre {
+    margin: 0;
+    background: transparent;
+}
+
+.terminal-shell #crt-terminal-mount {
+    outline: none;
+    min-height: 18rem;
+}

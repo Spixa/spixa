@@ -13,15 +13,9 @@ This website is hosted on CloudFlare pages connected from my [GitHub page](https
 ### Ambition
 Zola is pretty easy to work with! My ambition is to make one of my previous projects, or maybe even a new one, into an interactable thing that can be put on here. I'm still trying to figure out what. Some TUI frontend on the CRT effect of this theme would be extremely cool though. Like imagine this:
 
-{% crt() %}
+{% terminal() %}
 ```
-<anon1> hey!
-<anon2> whats good?
-
-
-
-
-> Type your message here...
+a
 ```
 {% end %}
 
