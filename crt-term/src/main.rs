@@ -2,13 +2,16 @@
 use std::{cell::RefCell, io, rc::Rc};
 
 use ratzilla::{
-    DomBackend, WebRenderer, event::KeyCode, ratatui::{
-        Terminal,
+    event::KeyCode,
+    ratatui::{
         layout::{Constraint, Direction, Layout},
         style::{Color, Modifier, Style},
         text::{Line, Span},
         widgets::{Block, Borders, Paragraph, Wrap},
-    }, web_sys::{self, wasm_bindgen},
+        Terminal,
+    },
+    web_sys::{self, wasm_bindgen},
+    DomBackend, WebRenderer,
 };
 use wasm_bindgen::{closure::Closure, JsCast};
 use web_sys::{Event, HtmlInputElement, KeyboardEvent};
@@ -25,10 +28,7 @@ impl App {
             output: vec![
                 ("CRT-OS v0.1.0".into(), false),
                 ("hey, how're you doing?".into(), true),
-                (
-                    "type 'help' to see available commands.".into(),
-                    true,
-                ),
+                ("type 'help' to see available commands.".into(), true),
                 (String::new(), false),
             ],
         }
@@ -56,11 +56,11 @@ impl App {
                 response.push("guest".to_string());
             }
             "date" => {
-                response.push(
-                    "Oh i dont know those stuff lol".to_string(),
-                );
+                response.push("Oh i dont know those stuff lol".to_string());
             }
-            "clear" => self.output.clear(),
+            "clear" => {
+                self.output.clear();
+            }
             "" => {}
             _ => {
                 response.push(format!("command not found: {command}"));
@@ -73,15 +73,15 @@ impl App {
         self.output.push((String::new(), false));
         self.input.clear();
 
+        // Keep the output buffer bounded.
         if self.output.len() > 200 {
-            self.output.drain(..self.output.len() - 200);
+            let excess = self.output.len() - 200;
+            self.output.drain(..excess);
         }
     }
 }
 
-fn setup_mobile_input(
-    app: Rc<RefCell<App>>,
-) -> Result<(), wasm_bindgen::JsValue> {
+fn setup_mobile_input(app: Rc<RefCell<App>>) -> Result<(), wasm_bindgen::JsValue> {
     let document = web_sys::window()
         .expect("window unavailable")
         .document()
@@ -96,35 +96,32 @@ fn setup_mobile_input(
         })?
         .dyn_into()?;
 
-    // Sync text typed using the virtual keyboard with Rust state.
+    // Sync typed characters from the HTML input into the terminal state.
     let app_for_input = Rc::clone(&app);
+    let input_handler = Closure::<dyn FnMut(Event)>::new(move |event: Event| {
+        let Some(target) = event.target() else {
+            return;
+        };
 
-    let input_handler = Closure::<dyn FnMut(Event)>::new(
-        move |event: Event| {
-            let Some(target) = event.target() else {
-                return;
-            };
+        let Ok(input) = target.dyn_into::<HtmlInputElement>() else {
+            return;
+        };
 
-            let Ok(input) = target.dyn_into::<HtmlInputElement>() else {
-                return;
-            };
-
-            app_for_input.borrow_mut().input = input.value();
-        },
-    );
+        app_for_input.borrow_mut().input = input.value();
+    });
 
     input.add_event_listener_with_callback(
         "input",
         input_handler.as_ref().unchecked_ref(),
     )?;
-
     input_handler.forget();
 
+    // Execute commands when Enter is pressed on the mobile keyboard.
     let app_for_enter = Rc::clone(&app);
     let input_for_enter = input.clone();
 
-    let enter_handler = Closure::<dyn FnMut(KeyboardEvent)>::new(
-        move |event: KeyboardEvent| {
+    let enter_handler =
+        Closure::<dyn FnMut(KeyboardEvent)>::new(move |event: KeyboardEvent| {
             if event.key() != "Enter" {
                 return;
             }
@@ -133,14 +130,12 @@ fn setup_mobile_input(
 
             app_for_enter.borrow_mut().execute();
             input_for_enter.set_value("");
-        },
-    );
+        });
 
     input.add_event_listener_with_callback(
         "keydown",
         enter_handler.as_ref().unchecked_ref(),
     )?;
-
     enter_handler.forget();
 
     Ok(())
@@ -155,6 +150,7 @@ fn main() -> io::Result<()> {
     let backend = DomBackend::new_by_id("terminal")?;
     let mut terminal = Terminal::new(backend)?;
 
+    // Desktop keyboard input.
     terminal.on_key_event({
         let app = Rc::clone(&app);
 
@@ -174,26 +170,15 @@ fn main() -> io::Result<()> {
 
     terminal.draw_web(move |frame| {
         let app = app.borrow();
-
         let area = frame.area();
-        let margin = if area.width < 60 { 0 } else { 2 };
-
-        let outer = Layout::default()
-            .direction(Direction::Horizontal)
-            .constraints([
-                Constraint::Length(margin),
-                Constraint::Min(0),
-                Constraint::Length(margin),
-            ])
-            .split(area);
 
         let areas = Layout::default()
             .direction(Direction::Vertical)
             .constraints([
                 Constraint::Min(1),
-                Constraint::Length(3),
+                Constraint::Length(1),
             ])
-            .split(outer[1]);
+            .split(area);
 
         let lines: Vec<Line<'_>> = app
             .output
@@ -202,7 +187,7 @@ fn main() -> io::Result<()> {
                 let color = if *is_response {
                     Color::White
                 } else {
-                    Color::Green
+                    Color::LightGreen
                 };
 
                 Line::from(Span::styled(
@@ -238,12 +223,7 @@ fn main() -> io::Result<()> {
                 format!("{}_", app.input),
                 Style::default().fg(Color::LightYellow),
             ),
-        ]))
-        .block(
-            Block::default()
-                .borders(Borders::ALL)
-                .border_style(Style::default().fg(Color::Green)),
-        );
+        ]));
 
         frame.render_widget(prompt, areas[1]);
     });
