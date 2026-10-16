@@ -26,7 +26,7 @@
         width: 100%;
         height: 100%;
         overflow: hidden;
-        background-color: #121212;
+        background: #121212;
       }
 
       body {
@@ -34,7 +34,7 @@
         min-height: 100dvh;
         display: flex;
         justify-content: center;
-        align-items: center;
+        align-items: stretch;
       }
 
       #terminal {
@@ -53,19 +53,6 @@
         margin: 0;
       }
 
-      /* compact terminal on phones. */
-      @media (max-width: 600px) {
-        #terminal {
-          padding: 2px;
-          font-size: 12px;
-        }
-
-        pre {
-          font-size: 12px;
-        }
-      }
-
-      /* only activate the mobile input on touch-oriented devices. */
       #mobile-terminal-input {
         position: fixed;
         left: 0;
@@ -76,7 +63,16 @@
         border: 0;
         opacity: 0.01;
         z-index: 10;
-        pointer-events: none;
+      }
+
+      @media (max-width: 600px) {
+        #terminal {
+          padding: 2px;
+        }
+
+        pre {
+          font-size: 11px;
+        }
       }
 
       @media (pointer: coarse) {
@@ -108,51 +104,13 @@
         "mobile-terminal-input"
       );
 
-      const isTouchDevice = window.matchMedia(
-        "(pointer: coarse)"
-      );
+      const isTouchDevice = window.matchMedia("(pointer: coarse)");
 
-      // on phones, tapping the terminal opens the virtual keyboard.
-      terminal.addEventListener("pointerdown", (event) => {
+      terminal.addEventListener("pointerdown", () => {
         if (!isTouchDevice.matches) return;
 
-        // Don't steal input from selectable text or other controls.
-        mobileInput.focus({ preventScroll: true });
-      });
-
-      // forwards virtual keyboard input to the keyboard events that the existing Ratzilla handler receives.
-      function sendKey(key, code) {
-        window.dispatchEvent(
-          new KeyboardEvent("keydown", {
-            key,
-            code,
-            bubbles: true,
-            cancelable: true,
-          })
-        );
-      }
-
-      mobileInput.addEventListener("input", () => {
-        if (!isTouchDevice.matches) return;
-
-        const text = mobileInput.value;
-        mobileInput.value = "";
-
-        // forward typed characters one at a time.
-        for (const char of text) {
-          sendKey(char, "");
-        }
-      });
-
-      mobileInput.addEventListener("keydown", (event) => {
-        if (!isTouchDevice.matches) return;
-
-        if (event.key === "Enter") {
-          event.preventDefault();
-          sendKey("Enter", "Enter");
-        } else if (event.key === "Backspace") {
-          event.preventDefault();
-          sendKey("Backspace", "Backspace");
+        if (document.activeElement !== mobileInput) {
+          mobileInput.focus({ preventScroll: true });
         }
       });
     </script>
