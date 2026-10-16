@@ -1,17 +1,15 @@
-
 use std::{cell::RefCell, io, rc::Rc};
 
 use ratzilla::{
-    DomBackend,
-    WebRenderer,
     event::KeyCode,
     ratatui::{
-        Terminal,
         layout::{Constraint, Direction, Layout},
         style::{Color, Modifier, Style},
         text::{Line, Span},
         widgets::{Block, Borders, Paragraph, Wrap},
+        Terminal,
     },
+    DomBackend, WebRenderer,
 };
 
 struct App {
@@ -26,10 +24,7 @@ impl App {
             output: vec![
                 ("CRT-OS v0.1.0".into(), false),
                 ("hey, how're you doing?".into(), true),
-                (
-                    "type 'help' to see available commands.".into(),
-                    true,
-                ),
+                ("type 'help' to see available commands.".into(), true),
                 (String::new(), false),
             ],
         }
@@ -39,17 +34,14 @@ impl App {
         let command = self.input.trim().to_string();
 
         // Command entered by the user stays green.
-        self.output
-            .push((format!("guest@crt:~$ {command}"), false));
+        self.output.push((format!("guest@crt:~$ {command}"), false));
 
         // Command results are white.
         let mut response = Vec::new();
 
         match command.as_str() {
             "help" => {
-                response.push(
-                    "available commands: help, about, clear, date, whoami".to_string(),
-                );
+                response.push("available commands: help, about, clear, date, whoami".to_string());
             }
             "about" => {
                 response.push("Hi! This is a WASM test".to_string());
@@ -59,9 +51,7 @@ impl App {
                 response.push("guest".to_string());
             }
             "date" => {
-                response.push(
-                    "Oh i dont know those stuff lol".to_string(),
-                );
+                response.push("Oh i dont know those stuff lol".to_string());
             }
             "clear" => {
                 self.output.clear();
@@ -111,21 +101,27 @@ fn main() -> io::Result<()> {
     terminal.draw_web(move |frame| {
         let app = app.borrow();
 
-        // Add horizontal margins so the terminal has breathing room.
+        let area = frame.area();
+
+        // Narrower margins on small screens.
+        let margin = if area.width < 60 { 0 } else { 2 };
+
         let outer = Layout::default()
             .direction(Direction::Horizontal)
             .constraints([
-                Constraint::Length(2),
+                Constraint::Length(margin),
                 Constraint::Min(0),
-                Constraint::Length(2),
+                Constraint::Length(margin),
             ])
-            .split(frame.area());
+            .split(area);
+
+        let compact = area.width < 60 || area.height < 20;
 
         let areas = Layout::default()
             .direction(Direction::Vertical)
             .constraints([
-                Constraint::Min(4),
-                Constraint::Length(3),
+                Constraint::Min(1),
+                Constraint::Length(if compact { 3 } else { 3 }),
             ])
             .split(outer[1]);
 
@@ -139,10 +135,7 @@ fn main() -> io::Result<()> {
                     Color::Green
                 };
 
-                Line::from(Span::styled(
-                    text.as_str(),
-                    Style::default().fg(color),
-                ))
+                Line::from(Span::styled(text.as_str(), Style::default().fg(color)))
             })
             .collect();
 

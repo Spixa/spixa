@@ -1,42 +1,166 @@
+
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0, user-scalable=no"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     />
+
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/fira_code.min.css"
     />
+
     <title>crt-term</title>
+
     <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
       body {
         margin: 0;
         width: 100%;
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        align-content: center;
+        height: 100%;
+        overflow: hidden;
         background-color: #121212;
       }
+
+      body {
+        min-height: 100vh;
+        min-height: 100dvh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      #terminal {
+        width: 100%;
+        height: 100%;
+        min-width: 0;
+        min-height: 0;
+        padding: 8px;
+        overflow: hidden;
+        outline: none;
+      }
+
       pre {
         font-family: "Fira Code", monospace;
         font-size: 16px;
-        margin: 0px;
+        margin: 0;
+      }
+
+      /* Compact terminal on phones. */
+      @media (max-width: 600px) {
+        #terminal {
+          padding: 2px;
+          font-size: 12px;
+        }
+
+        pre {
+          font-size: 12px;
+        }
+      }
+
+      /* Only activate the mobile input on touch-oriented devices. */
+      #mobile-terminal-input {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        border: 0;
+        opacity: 0.01;
+        z-index: 10;
+        pointer-events: none;
+      }
+
+      @media (pointer: coarse) {
+        #mobile-terminal-input {
+          pointer-events: auto;
+        }
       }
     </style>
-  <link rel="modulepreload" href="/terminal/crt-term-46e4eb649193eb12.js" crossorigin="anonymous" integrity="sha384-V4nMiQEsd+LRB3AmSFRFkm4SFRPnt3+x+NoButy2cWxPv5veL63n2O8rC3smTuKT"><link rel="preload" href="/terminal/crt-term-46e4eb649193eb12_bg.wasm" crossorigin="anonymous" integrity="sha384-BfL8Zmgy1I6jTr2I3Qm93ulSGlK2JNhifLxyrsSkYsiHx0TvppdyvUk31vUceuF2" as="fetch" type="application/wasm"></head>
+  <link rel="modulepreload" href="/terminal/crt-term-ec5c320a5b6424c7.js" crossorigin="anonymous" integrity="sha384-V4nMiQEsd+LRB3AmSFRFkm4SFRPnt3+x+NoButy2cWxPv5veL63n2O8rC3smTuKT"><link rel="preload" href="/terminal/crt-term-ec5c320a5b6424c7_bg.wasm" crossorigin="anonymous" integrity="sha384-rGA4y6c6cmlCiUE8c/FfqR3KbuTQ2RvuBA8AvY7nr6PExuUjT2pYA8u1736TSM1E" as="fetch" type="application/wasm"></head>
+
   <body>
     <div id="terminal" tabindex="0"></div>
+
+    <input
+      id="mobile-terminal-input"
+      type="text"
+      autocomplete="off"
+      autocapitalize="off"
+      spellcheck="false"
+      enterkeyhint="send"
+      aria-label="Terminal command input"
+    />
+
     <script type="module" src="/src/main.rs"></script>
+
+    <script>
+      const terminal = document.getElementById("terminal");
+      const mobileInput = document.getElementById(
+        "mobile-terminal-input"
+      );
+
+      const isTouchDevice = window.matchMedia(
+        "(pointer: coarse)"
+      );
+
+      // On phones, tapping the terminal opens the virtual keyboard.
+      terminal.addEventListener("pointerdown", (event) => {
+        if (!isTouchDevice.matches) return;
+
+        // Don't steal input from selectable text or other controls.
+        mobileInput.focus({ preventScroll: true });
+      });
+
+      // Forward virtual keyboard input to the keyboard events
+      // that the existing Ratzilla handler receives.
+      function sendKey(key, code) {
+        window.dispatchEvent(
+          new KeyboardEvent("keydown", {
+            key,
+            code,
+            bubbles: true,
+            cancelable: true,
+          })
+        );
+      }
+
+      mobileInput.addEventListener("input", () => {
+        if (!isTouchDevice.matches) return;
+
+        const text = mobileInput.value;
+        mobileInput.value = "";
+
+        // Forward typed characters one at a time.
+        for (const char of text) {
+          sendKey(char, "");
+        }
+      });
+
+      mobileInput.addEventListener("keydown", (event) => {
+        if (!isTouchDevice.matches) return;
+
+        if (event.key === "Enter") {
+          event.preventDefault();
+          sendKey("Enter", "Enter");
+        } else if (event.key === "Backspace") {
+          event.preventDefault();
+          sendKey("Backspace", "Backspace");
+        }
+      });
+    </script>
   
 <script type="module">
-import init, * as bindings from '/terminal/crt-term-46e4eb649193eb12.js';
-const wasm = await init({ module_or_path: '/terminal/crt-term-46e4eb649193eb12_bg.wasm' });
+import init, * as bindings from '/terminal/crt-term-ec5c320a5b6424c7.js';
+const wasm = await init({ module_or_path: '/terminal/crt-term-ec5c320a5b6424c7_bg.wasm' });
 
 
 window.wasmBindings = bindings;
@@ -46,4 +170,3 @@ dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
 
 </script></body>
 </html>
-
